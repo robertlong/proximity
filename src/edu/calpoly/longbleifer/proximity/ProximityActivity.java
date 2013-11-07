@@ -18,6 +18,7 @@ import android.os.RemoteException;
 import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.TextView;
 
 public class ProximityActivity extends Activity implements IBeaconConsumer {
 	
@@ -90,6 +91,8 @@ public class ProximityActivity extends Activity implements IBeaconConsumer {
 	    	Log.i(TAG, trigger.toString());
 	    	
 	    	// TODO Render a view with the trigger data.
+	    	TextView log = (TextView) findViewById(R.id.beacon_log);
+	    	log.append("\n " + trigger.toString());
 	    }
 
 	    @Override
