@@ -13,91 +13,170 @@ import com.radiusnetworks.ibeacon.IBeaconManager;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.app.Activity;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.TextView;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-public class ProximityActivity extends Activity implements IBeaconConsumer {
+public class ProximityActivity extends FragmentActivity {
 	
-	protected static final String TAG = "Proximity";
-    private IBeaconManager iBeaconManager = IBeaconManager.getInstanceForApplication(this);
-    private HashMap<String, Trigger> beaconHistory;
-    private Api api;
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private ActionBarDrawerToggle drawerToggle;
+    private CharSequence title;
+    private String[] pages = {"Test1", "Test2"};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_proximity);
 		
-		iBeaconManager.bind(this);
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        setupDrawer();
+        
+        if (savedInstanceState == null) {
+        	setMainContent(0);
+        }
+        
+        if (!BeaconService.started) {
+        	Intent serviceIntent = new Intent(this, BeaconService.class);
+            startService(serviceIntent);
+        }
+        
 	}
+	
+	@Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggls
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
 	
 	@Override
     protected void onDestroy() {
         super.onDestroy();
-        iBeaconManager.unBind(this);
+    }
+	
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.proximity, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.proximity, menu);
-		return true;
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
+        // menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+         // The action bar home/up action should open or close the drawer.
+         // ActionBarDrawerToggle will take care of this.
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        
+        // Handle action buttons
+        switch(item.getItemId()) {
+//        case R.id.action_websearch:
+//            // create intent to perform web search for this planet
+//            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+//            intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
+//            // catch event that there's no activity to handle intent
+//            if (intent.resolveActivity(getPackageManager()) != null) {
+//                startActivity(intent);
+//            } else {
+//                Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
+//            }
+//            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+	
+	private void setupDrawer() {
+        // set up the drawer's list view with items and click listener
+        drawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.drawer_list_item, pages));
+        drawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        drawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                drawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+                ) {
+            public void onDrawerClosed(View view) {
+                getActionBar().setTitle(title);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(title);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        drawerLayout.setDrawerListener(drawerToggle);
 	}
 	
-	@Override
-    public void onIBeaconServiceConnect() {
-		beaconHistory = new HashMap<String, Trigger>();
-		api = ApiClient.buildApi();
-		
-        iBeaconManager.setRangeNotifier(new RangeNotifier() {
-            @Override 
-            public void didRangeBeaconsInRegion(Collection<IBeacon> iBeacons, Region region) {
-                if (iBeacons.size() > 0) {
-                	for(IBeacon beacon : iBeacons) {
-                		String uuid = beacon.getProximityUuid();
-                		int major = beacon.getMajor();
-                		int minor = beacon.getMinor();
-                		double distance = beacon.getAccuracy();
-                		
-                		Log.i(TAG, "I see a beacon "+ distance +" meters away.");
-                        Log.i(TAG, "UUID: " + uuid + " Major: " + major + " Minor: " + minor);
-                        
-                        if (!beaconHistory.containsKey(uuid)) {
-                        	Log.i(TAG, "Found new beacon ");
-                        	Log.i(TAG, "UUID: " + uuid + " Major: " + major + " Minor: " + minor);
-                        	
-                        	api.findBeacon(uuid, onFoundBeacon);
-                        }
-                        
-                        beaconHistory.put(uuid, new Trigger(uuid));
-                	}
-                    
-                }
-            }
-        });
-
-        try {
-            iBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-        } catch (RemoteException e) {   }
+	private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            setMainContent(position);
+        }
     }
 	
-	private Callback<Trigger> onFoundBeacon = new Callback<Trigger>() {
-	    @Override
-	    public void success(Trigger trigger, Response response) {
-	    	Log.i(TAG, trigger.toString());
-	    	
-	    	// TODO Render a view with the trigger data.
-	    	TextView log = (TextView) findViewById(R.id.beacon_log);
-	    	log.append("\n " + trigger.toString());
-	    }
+	private void setMainContent(int position) {
+        Fragment fragment = new InfoModule();
+//        Bundle args = new Bundle();
+//        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+//        fragment.setArguments(args);
 
-	    @Override
-	    public void failure(RetrofitError retrofitError) {
-	    	Log.e(TAG, retrofitError.toString());
-	    }
-	};
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+        // update selected item and title, then close the drawer
+        drawerList.setItemChecked(position, true);
+        setTitle(pages[position]);
+        drawerLayout.closeDrawer(drawerList);
+    }
+	
+	@Override
+    public void setTitle(CharSequence title) {
+        this.title = title;
+        getActionBar().setTitle(title);
+    }
 }
