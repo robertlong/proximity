@@ -1,37 +1,16 @@
 package edu.calpoly.longbleifer.proximity;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
-import com.radiusnetworks.ibeacon.IBeacon;
-import com.radiusnetworks.ibeacon.IBeaconConsumer;
-import com.radiusnetworks.ibeacon.IBeaconManager;
-import com.radiusnetworks.ibeacon.RangeNotifier;
-import com.radiusnetworks.ibeacon.Region;
-
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewFragment;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -99,7 +78,7 @@ public class ProximityActivity extends FragmentActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
+        // boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
         // menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }

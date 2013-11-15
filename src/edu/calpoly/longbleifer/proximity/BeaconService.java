@@ -2,8 +2,6 @@ package edu.calpoly.longbleifer.proximity;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -15,18 +13,14 @@ import com.radiusnetworks.ibeacon.IBeaconManager;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Messenger;
 import android.os.RemoteException;
-import android.os.SystemClock;
 import android.util.Log;
 
 public class BeaconService extends Service implements IBeaconConsumer {
