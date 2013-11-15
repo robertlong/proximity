@@ -27,6 +27,10 @@
         </activity>
         
         <service android:enabled="true"
+            android:label="BeaconService"
+            android:name="edu.calpoly.longbleifer.proximity.BeaconService">
+        </service>
+        <service android:enabled="true"
             android:exported="true"
             android:isolatedProcess="false"
             android:label="iBeacon"

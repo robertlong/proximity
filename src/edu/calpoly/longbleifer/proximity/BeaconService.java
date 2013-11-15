@@ -2,6 +2,8 @@ package edu.calpoly.longbleifer.proximity;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -13,14 +15,19 @@ import com.radiusnetworks.ibeacon.IBeaconManager;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
+import android.app.IntentService;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.util.Log;
 
-public class BeaconService extends Service implements IBeaconConsumer {
-	
+public class BeaconService extends IntentService implements IBeaconConsumer {
+
 	protected static final String TAG = "BeaconService";
     private IBeaconManager iBeaconManager = IBeaconManager.getInstanceForApplication(this);
     private HashMap<String, Trigger> beaconHistory;
@@ -28,26 +35,33 @@ public class BeaconService extends Service implements IBeaconConsumer {
     
     public static Boolean started = false;
     
+    public BeaconService() {
+		super("BeaconService");
+	} 
 
 	@Override
-	public void onCreate() {
-		super.onCreate();
-		Log.i(TAG, "Created service");
-		iBeaconManager.bind(this);
-		started = true;
+	protected void onHandleIntent(Intent intent) {
+		startBeaconScan();
+		SystemClock.sleep(3000);
 	}
 
 	@Override
 	public void onDestroy() {
+		Log.i(TAG, "Called onDestroy");
+		stopBeaconScan();
 		super.onDestroy();
-		Log.i(TAG, "Destroyed service");
+	}
+	
+	private void startBeaconScan() {
+		Log.i(TAG, "Started scan.");
+		iBeaconManager.bind(this);
+		started = true;
+	}
+	
+	private void stopBeaconScan() {
+		Log.i(TAG, "Stopped scan.");
 		iBeaconManager.unBind(this);
 		started = false;
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
 	}
 
 	@Override
@@ -77,7 +91,6 @@ public class BeaconService extends Service implements IBeaconConsumer {
                         
                         beaconHistory.put(uuid, new Trigger(uuid));
                 	}
-                    
                 }
             }
         });

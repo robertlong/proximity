@@ -1,5 +1,6 @@
 package edu.calpoly.longbleifer.proximity;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -13,6 +14,9 @@ import com.radiusnetworks.ibeacon.IBeaconManager;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -60,10 +64,14 @@ public class ProximityActivity extends FragmentActivity {
         	setMainContent(0);
         }
         
-        if (!BeaconService.started) {
-        	Intent serviceIntent = new Intent(this, BeaconService.class);
-            startService(serviceIntent);
-        }
+        Calendar cal = Calendar.getInstance();
+
+        Intent intent = new Intent(this, BeaconService.class);
+        PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
+
+        AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        // Start every 30 seconds
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30*1000, pintent);
         
 	}
 	
