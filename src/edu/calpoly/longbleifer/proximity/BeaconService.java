@@ -16,6 +16,9 @@ import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -26,42 +29,51 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 
-public class BeaconService extends IntentService implements IBeaconConsumer {
+public class BeaconService extends Service implements IBeaconConsumer {
 
 	protected static final String TAG = "BeaconService";
     private IBeaconManager iBeaconManager = IBeaconManager.getInstanceForApplication(this);
     private HashMap<String, Trigger> beaconHistory;
     private Api api;
+    private Region region;
+    private Context context;
     
-    public static Boolean started = false;
-    
-    public BeaconService() {
-		super("BeaconService");
-	} 
+    public IBinder onBind(Intent intent)
+    {
+        return null;
+    }
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		startBeaconScan();
-		SystemClock.sleep(3000);
-	}
+    @Override
+    public void onCreate() {
+    	context = this;
+    	Log.i(TAG, "Called onCreate");
+    	region = new Region("main", null, null, null);
+    	
+    }
 
-	@Override
-	public void onDestroy() {
-		Log.i(TAG, "Called onDestroy");
-		stopBeaconScan();
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+    	iBeaconManager.bind(this);      
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+    	Log.i(TAG, "Called onDestroy");
+		iBeaconManager.unBind(this);
 		super.onDestroy();
-	}
-	
-	private void startBeaconScan() {
-		Log.i(TAG, "Started scan.");
-		iBeaconManager.bind(this);
-		started = true;
-	}
+    }
+    
+    private void startBeaconScan() {
+    	try {
+            iBeaconManager.startRangingBeaconsInRegion(region);
+        } catch (RemoteException e) {   }
+    }
 	
 	private void stopBeaconScan() {
-		Log.i(TAG, "Stopped scan.");
-		iBeaconManager.unBind(this);
-		started = false;
+		try {
+            iBeaconManager.stopRangingBeaconsInRegion(region);
+        } catch (RemoteException e) {   }
 	}
 
 	@Override
@@ -73,6 +85,8 @@ public class BeaconService extends IntentService implements IBeaconConsumer {
             @Override 
             public void didRangeBeaconsInRegion(Collection<IBeacon> iBeacons, Region region) {
                 if (iBeacons.size() > 0) {
+                	stopBeaconScan();
+                	
                 	for(IBeacon beacon : iBeacons) {
                 		String uuid = beacon.getProximityUuid();
                 		int major = beacon.getMajor();
@@ -89,26 +103,42 @@ public class BeaconService extends IntentService implements IBeaconConsumer {
                         	api.findBeacon(uuid, onFoundBeacon);
                         }
                         
-                        beaconHistory.put(uuid, new Trigger(uuid));
                 	}
                 }
             }
         });
 
-        try {
-            iBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-        } catch (RemoteException e) {   }
+        startBeaconScan();
     }
 	
 	private Callback<Trigger> onFoundBeacon = new Callback<Trigger>() {
 	    @Override
 	    public void success(Trigger trigger, Response response) {
 	    	Log.i(TAG, trigger.toString());
+	    	
+	    	Intent targetIntent = new Intent(context, ProximityActivity.class);
+	    	PendingIntent intent = PendingIntent.getActivity(context, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+	    	
+	    	NotificationManager notificationManager =
+	    			(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+	    	Notification  notification = new Notification.Builder(context)
+	    	 .setSmallIcon(R.drawable.ic_launcher)
+	         .setContentTitle("Found beacon!")
+	         .setContentText(trigger.toString())
+	         .setContentIntent(intent)
+	         .build();
+	    	
+	    	notificationManager.notify(35289, notification);
+	    	
+	    	Log.i("NOTIFICATION", trigger.toString());
+	    	beaconHistory.put(trigger.uuid, trigger);
+	    	startBeaconScan();
 	    }
 
 	    @Override
 	    public void failure(RetrofitError retrofitError) {
-	    	Log.e(TAG, retrofitError.toString());
+	    	Log.e(TAG, retrofitError.getMessage());
+	    	startBeaconScan();
 	    }
 	};
 
