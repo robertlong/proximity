@@ -26,6 +26,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewFragment;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -36,7 +38,7 @@ public class ProximityActivity extends FragmentActivity {
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
     private CharSequence title;
-    private String[] pages = {"Test1", "Test2"};
+    public static Trigger trigger;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,12 @@ public class ProximityActivity extends FragmentActivity {
 		
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        InfoTab infoTab = new InfoTab("Info", "Info Module", "<html><body>You scored <b>192</b> points.</body></html>");
+        RestaurantTab restaurantTab = new RestaurantTab("Restaurant", "Restaurant Module");
+        StoreTab storeTab = new StoreTab("Store", "Store Module");
+        Tab[] tabs = {infoTab, restaurantTab, storeTab};
+        trigger = new Trigger("testUUID", 0, 0, "testName", tabs);
         
         setupDrawer();
         
@@ -122,8 +130,8 @@ public class ProximityActivity extends FragmentActivity {
 	
 	private void setupDrawer() {
         // set up the drawer's list view with items and click listener
-        drawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, pages));
+        drawerList.setAdapter(new ArrayAdapter<Tab>(this,
+                R.layout.drawer_list_item, trigger.tabs));
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
@@ -160,17 +168,30 @@ public class ProximityActivity extends FragmentActivity {
     }
 	
 	private void setMainContent(int position) {
-        Fragment fragment = new InfoModule();
-//        Bundle args = new Bundle();
-//        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-//        fragment.setArguments(args);
-
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+		Fragment fragment = null;
+		Bundle args = new Bundle();
+		
+		String type = trigger.tabs[position].type;
+		if (type.equals("Info")) {
+			fragment = new InfoFragment();
+			args.putInt("id", position);
+			fragment.setArguments(args);
+		}
+		else if (type.equals("Restaurant")) {
+			fragment = new RestaurantFragment();
+		}
+		else if (type.equals("Store")) {
+			fragment = new StoreFragment();
+		}
+		
+		if (fragment != null) {
+			FragmentManager fragmentManager = this.getSupportFragmentManager();
+			fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+		}
 
         // update selected item and title, then close the drawer
         drawerList.setItemChecked(position, true);
-        setTitle(pages[position]);
+        setTitle(trigger.tabs[position].type);
         drawerLayout.closeDrawer(drawerList);
     }
 	
