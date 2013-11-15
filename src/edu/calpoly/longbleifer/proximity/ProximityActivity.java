@@ -31,9 +31,9 @@ public class ProximityActivity extends FragmentActivity {
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         
-        InfoTab infoTab = new InfoTab("Info", "Info Module", "<html><body>You scored <b>192</b> points.</body></html>");
-        RestaurantTab restaurantTab = new RestaurantTab("Restaurant", "Restaurant Module");
-        StoreTab storeTab = new StoreTab("Store", "Store Module");
+        InfoTab infoTab = new InfoTab("Info", "Info Tab", "<html><body>You scored <b>192</b> points.</body></html>");
+        RestaurantTab restaurantTab = new RestaurantTab("Restaurant", "Restaurant Tab");
+        StoreTab storeTab = new StoreTab("Store", "Store Tab");
         Tab[] tabs = {infoTab, restaurantTab, storeTab};
         trigger = new Trigger("testUUID", 0, 0, "testName", tabs);
         
