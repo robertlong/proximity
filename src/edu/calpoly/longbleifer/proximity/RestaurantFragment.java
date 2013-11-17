@@ -29,11 +29,13 @@ public class RestaurantFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         final ActionBar bar = this.getActivity().getActionBar();
+        bar.removeAllTabs();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
         
         ViewPager viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
         TabsAdapter mTabsAdapter = new TabsAdapter(this.getActivity(), viewPager);
+         
         mTabsAdapter.addTab(bar.newTab().setText("Appetizers"), ItemsListFragment.class, null);
         mTabsAdapter.addTab(bar.newTab().setText("Entrees"), ItemsListFragment.class, null);
         mTabsAdapter.addTab(bar.newTab().setText("Desserts"), ItemsListFragment.class, null);

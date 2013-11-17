@@ -1,5 +1,6 @@
 package edu.calpoly.longbleifer.proximity;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -151,6 +152,9 @@ public class ProximityActivity extends FragmentActivity {
 	private void setMainContent(int position) {
 		Fragment fragment = null;
 		Bundle args = new Bundle();
+		
+		final ActionBar bar = getActionBar();
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		
 		String type = trigger.tabs[position].type;
 		if (type.equals("Info")) {
