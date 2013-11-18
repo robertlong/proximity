@@ -1,10 +1,10 @@
 package edu.calpoly.longbleifer.proximity.models;
 
 import java.util.List;
+import java.util.Locale;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
 
-import com.activeandroid.Cache;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.*;
 import com.activeandroid.query.Select;

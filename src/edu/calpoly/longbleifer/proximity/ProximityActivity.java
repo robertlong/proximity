@@ -36,15 +36,21 @@ public class ProximityActivity extends FragmentActivity {
 		
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
-        trigger = Trigger.all().get(0);
-//        trigger = new Trigger("testUUID", 0, 0, "testName");
-//        trigger.save();
-//        InfoTab infoTab = new InfoTab("Info", "Info Tab", "<html><body>You scored <b>192</b> points.</body></html>", trigger);
-//        infoTab.save();
-//        RestaurantTab restaurantTab = new RestaurantTab("Restaurant", "Restaurant Tab", trigger);
-//        restaurantTab.save();
-//        StoreTab storeTab = new StoreTab("Store", "Store Tab", trigger);
-//        storeTab.save();
+        
+        //if (Trigger.all().isEmpty()) {
+          trigger = new Trigger("testUUID", 0, 0, "testName");
+          trigger.save();
+          Tab infoTab = new Tab("Info", "Info Tab", 0, "{\"html\":\"Hello World!\"}", trigger);
+          infoTab.save();
+          Tab restaurantTab = new Tab("Restaurant", "Restaurant Tab", 1, trigger);
+          restaurantTab.save();
+          Tab storeTab = new Tab("Store", "Store Tab", 2, trigger);
+          storeTab.save();
+        //}
+        Log.i("Proximity", "Triggers: " + Trigger.all().size());
+        List<Trigger> triggers = Trigger.all(); 
+        trigger = triggers.get(triggers.size() - 1);
+        Log.i("Proximity", "CurTabs:" + trigger.tabs().size());
         
         setupDrawer();
         
