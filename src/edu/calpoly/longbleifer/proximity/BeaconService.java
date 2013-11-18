@@ -13,6 +13,7 @@ import com.radiusnetworks.ibeacon.IBeaconManager;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
+import edu.calpoly.longbleifer.proximity.models.Trigger;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

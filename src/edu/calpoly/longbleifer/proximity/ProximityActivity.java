@@ -1,5 +1,9 @@
 package edu.calpoly.longbleifer.proximity;
 
+import java.util.List;
+
+import edu.calpoly.longbleifer.proximity.models.Tab;
+import edu.calpoly.longbleifer.proximity.models.Trigger;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,12 +36,15 @@ public class ProximityActivity extends FragmentActivity {
 		
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
-        
-        InfoTab infoTab = new InfoTab("Info", "Info Tab", "<html><body>You scored <b>192</b> points.</body></html>");
-        RestaurantTab restaurantTab = new RestaurantTab("Restaurant", "Restaurant Tab");
-        StoreTab storeTab = new StoreTab("Store", "Store Tab");
-        Tab[] tabs = {infoTab, restaurantTab, storeTab};
-        trigger = new Trigger("testUUID", 0, 0, "testName", tabs);
+        trigger = Trigger.all().get(0);
+//        trigger = new Trigger("testUUID", 0, 0, "testName");
+//        trigger.save();
+//        InfoTab infoTab = new InfoTab("Info", "Info Tab", "<html><body>You scored <b>192</b> points.</body></html>", trigger);
+//        infoTab.save();
+//        RestaurantTab restaurantTab = new RestaurantTab("Restaurant", "Restaurant Tab", trigger);
+//        restaurantTab.save();
+//        StoreTab storeTab = new StoreTab("Store", "Store Tab", trigger);
+//        storeTab.save();
         
         setupDrawer();
         
@@ -112,8 +120,7 @@ public class ProximityActivity extends FragmentActivity {
 	
 	private void setupDrawer() {
         // set up the drawer's list view with items and click listener
-        drawerList.setAdapter(new ArrayAdapter<Tab>(this,
-                R.layout.drawer_list_item, trigger.tabs));
+        drawerList.setAdapter(new ArrayAdapter<Tab>(this, R.layout.drawer_list_item, trigger.tabs()));
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
@@ -152,31 +159,34 @@ public class ProximityActivity extends FragmentActivity {
 	private void setMainContent(int position) {
 		Fragment fragment = null;
 		Bundle args = new Bundle();
-		
+		List<Tab> tabs = trigger.tabs();
 		final ActionBar bar = getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		
-		String type = trigger.tabs[position].type;
-		if (type.equals("Info")) {
-			fragment = new InfoFragment();
-			args.putInt("id", position);
-			fragment.setArguments(args);
-		}
-		else if (type.equals("Restaurant")) {
-			fragment = new RestaurantFragment();
-		}
-		else if (type.equals("Store")) {
-			fragment = new StoreFragment();
-		}
-		
-		if (fragment != null) {
-			FragmentManager fragmentManager = this.getSupportFragmentManager();
-			fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-		}
+        if (position <= tabs.size() - 1) {
+        	String type = tabs.get(position).type;
+    		if (type.equals("Info")) {
+    			fragment = new InfoFragment();
+    			args.putInt("id", position);
+    			fragment.setArguments(args);
+    		}
+    		else if (type.equals("Restaurant")) {
+    			fragment = new RestaurantFragment();
+    		}
+    		else if (type.equals("Store")) {
+    			fragment = new StoreFragment();
+    		}
+    		
+    		if (fragment != null) {
+    			FragmentManager fragmentManager = this.getSupportFragmentManager();
+    			fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+    		}
 
-        // update selected item and title, then close the drawer
-        drawerList.setItemChecked(position, true);
-        setTitle(trigger.tabs[position].type);
+            // update selected item and title, then close the drawer
+            drawerList.setItemChecked(position, true);
+            setTitle(tabs.get(position).title);
+        }
+		
         drawerLayout.closeDrawer(drawerList);
     }
 	

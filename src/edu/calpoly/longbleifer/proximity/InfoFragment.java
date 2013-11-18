@@ -1,5 +1,6 @@
 package edu.calpoly.longbleifer.proximity;
 
+import edu.calpoly.longbleifer.proximity.models.InfoTab;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,7 +17,7 @@ public class InfoFragment extends Fragment {
         Bundle savedInstanceState) {
 		
 		int position = this.getArguments().getInt("id");
-		InfoTab tab = (InfoTab) ProximityActivity.trigger.tabs[position];
+		InfoTab tab = (InfoTab) ProximityActivity.trigger.tabs().get(position);
         
         LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.info_fragment, container, false);
         WebView webview = (WebView) layout.findViewById(R.id.webView);
