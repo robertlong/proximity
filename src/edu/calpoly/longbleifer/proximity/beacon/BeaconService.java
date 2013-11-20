@@ -1,7 +1,9 @@
 package edu.calpoly.longbleifer.proximity.beacon;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import com.radiusnetworks.ibeacon.IBeacon;
 import com.radiusnetworks.ibeacon.IBeaconConsumer;
@@ -28,7 +30,7 @@ public class BeaconService extends Service implements IBeaconConsumer {
 
 	protected static final String TAG = "BeaconService";
     private IBeaconManager iBeaconManager = IBeaconManager.getInstanceForApplication(this);
-    private HashMap<String, Trigger> beaconHistory;
+    private ArrayList<String> beaconHistory;
     private Region region;
     private Context context;
     
@@ -72,7 +74,7 @@ public class BeaconService extends Service implements IBeaconConsumer {
 
 	@Override
     public void onIBeaconServiceConnect() {
-		beaconHistory = new HashMap<String, Trigger>();
+		beaconHistory = new ArrayList<String>();
 		
         iBeaconManager.setRangeNotifier(new RangeNotifier() {
             @Override 
@@ -89,7 +91,7 @@ public class BeaconService extends Service implements IBeaconConsumer {
                 		Log.i(TAG, "I see a beacon "+ distance +" meters away.");
                         Log.i(TAG, "UUID: " + uuid + " Major: " + major + " Minor: " + minor);
                         
-                        if (!beaconHistory.containsKey(uuid)) {
+                        if (!beaconHistory.contains(uuid)) {
                         	Log.i(TAG, "Found new beacon ");
                         	Log.i(TAG, "UUID: " + uuid + " Major: " + major + " Minor: " + minor);
                         	
@@ -123,6 +125,8 @@ public class BeaconService extends Service implements IBeaconConsumer {
 	         .build();
 	    	
 	    	notificationManager.notify(35289, notification);
+	    	
+	    	beaconHistory.add(trigger.uuid);
 	    	
 	    	Log.i("NOTIFICATION", trigger.toString());
 	    	startBeaconScan();
