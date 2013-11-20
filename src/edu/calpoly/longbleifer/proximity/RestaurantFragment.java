@@ -2,18 +2,23 @@ package edu.calpoly.longbleifer.proximity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import edu.calpoly.longbleifer.proximity.models.RestaurantItem;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +26,13 @@ import android.view.ViewGroup;
 public class RestaurantFragment extends Fragment {
 	
 	private HashMap<String, ArrayList<RestaurantItem>> itemsByCategory;
+	private edu.calpoly.longbleifer.proximity.models.Tab tab;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    	int position = this.getArguments().getInt("id");
+		this.tab = ProximityActivity.trigger.tabs().get(position);
+		
         return inflater.inflate(R.layout.restaurant_fragment, container, false);
     }
 
@@ -31,29 +40,61 @@ public class RestaurantFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        itemsByCategory = new HashMap<String, ArrayList<RestaurantItem>>();
-        ArrayList<RestaurantItem> items = new ArrayList<RestaurantItem>();
-        ArrayList<RestaurantItem> items2 = new ArrayList<RestaurantItem>();
-        items.add(new RestaurantItem("Test Item", 1.00));
-        items2.add(new RestaurantItem("Test Item1", 1.00));
-        itemsByCategory.put("test", items);
-        itemsByCategory.put("Test 2", items2);
+        this.itemsByCategory = new HashMap<String, ArrayList<RestaurantItem>>();
+        this.parseItems();
+        
+        ViewPager viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
+        TabsAdapter tabsAdapter = new TabsAdapter(this.getActivity(), viewPager, itemsByCategory);
+        viewPager.setAdapter(tabsAdapter);
 
         final ActionBar bar = this.getActivity().getActionBar();
         bar.removeAllTabs();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
-        
-        ViewPager viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
-        TabsAdapter mTabsAdapter = new TabsAdapter(this.getActivity(), viewPager, itemsByCategory);
 
         if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
         }
     }
+    
+    private void parseItems() {
+    	try {
+			JSONObject metadata = new JSONObject(this.tab.metadata);
+			Iterator<?> categories = metadata.keys();
+
+	        while( categories.hasNext() ){
+	            String category = (String)categories.next();
+	            if( metadata.get(category) instanceof JSONArray ){
+	            	ArrayList<RestaurantItem> itemArray = new ArrayList<RestaurantItem>();
+	            	JSONArray items = (JSONArray) metadata.get(category);
+	            	for (int i = 0; i < items.length(); i++) {
+	            		JSONObject properties = items.getJSONObject(i);
+	            		
+	            		if (properties.has("name") && properties.has("price")) {
+		            		RestaurantItem item = new RestaurantItem(properties.getString("name"), properties.getDouble("price"));
+		            		
+		            		if (properties.has("description")) {
+		            			item.description = properties.getString("description");
+		            		}
+		            		
+		            		if (properties.has("image")) {
+		            			item.image = properties.getString("image");
+		            		}
+		            		
+		            		itemArray.add(item);
+		            	}
+	            	}
+	            	
+	            	this.itemsByCategory.put(category, itemArray);
+	            }
+	        }
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+    }
 
     public static class TabsAdapter extends FragmentPagerAdapter implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
-            private final Context context;
             private final ActionBar actionBar;
             private final ViewPager viewPager;
             private final HashMap<String, ArrayList<RestaurantItem>> itemsByCategory;
@@ -61,7 +102,6 @@ public class RestaurantFragment extends Fragment {
             public TabsAdapter(Activity activity, ViewPager pager, HashMap<String, ArrayList<RestaurantItem>> itemsByCategory) {
                 super(((FragmentActivity) activity).getSupportFragmentManager());
                 this.itemsByCategory = itemsByCategory;
-                this.context = activity;
                 this.actionBar = activity.getActionBar();
                 this.viewPager = pager;
                 this.viewPager.setAdapter(this);
@@ -90,7 +130,9 @@ public class RestaurantFragment extends Fragment {
             	ArrayList<String> categories = new ArrayList<String>(this.itemsByCategory.keySet());
             	String category = categories.get(position);
                 ArrayList<RestaurantItem> items = this.itemsByCategory.get(category);
-                return new ItemsListFragment();
+                ItemsListFragment itemsListFragment = new ItemsListFragment();
+                itemsListFragment.setItems(items);
+                return itemsListFragment;
             }
 
             @Override

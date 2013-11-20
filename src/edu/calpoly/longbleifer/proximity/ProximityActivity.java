@@ -172,17 +172,20 @@ public class ProximityActivity extends FragmentActivity {
 		
         if (position <= tabs.size() - 1) {
         	String type = tabs.get(position).type;
-    		if (type.equals("Info")) {
+        	args.putInt("id", position);
+        	
+        	if (type.equals("Info")) {
     			fragment = new InfoFragment();
-    			args.putInt("id", position);
     			fragment.setArguments(args);
     		}
     		else if (type.equals("Restaurant")) {
     			fragment = new RestaurantFragment();
+    			fragment.setArguments(args);
     		}
     		else if (type.equals("Store")) {
     			fragment = new StoreFragment();
-    		}
+    			fragment.setArguments(args);
+    		}    		
     		
     		if (fragment != null) {
     			FragmentManager fragmentManager = this.getSupportFragmentManager();
