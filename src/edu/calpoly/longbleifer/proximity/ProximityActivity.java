@@ -2,6 +2,7 @@ package edu.calpoly.longbleifer.proximity;
 
 import java.util.List;
 
+import edu.calpoly.longbleifer.proximity.beacon.BeaconService;
 import edu.calpoly.longbleifer.proximity.models.Tab;
 import edu.calpoly.longbleifer.proximity.models.Trigger;
 import android.app.ActionBar;
@@ -13,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,29 +37,30 @@ public class ProximityActivity extends FragmentActivity {
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         
-        //if (Trigger.all().isEmpty()) {
-          trigger = new Trigger("testUUID", 0, 0, "testName");
-          trigger.save();
-          Tab infoTab = new Tab("Info", "Info Tab", 0, "{\"html\":\"Hello World!\"}", trigger);
-          infoTab.save();
-          Tab restaurantTab = new Tab("Restaurant", "Restaurant Tab", 1, trigger);
-          restaurantTab.save();
-          Tab storeTab = new Tab("Store", "Store Tab", 2, trigger);
-          storeTab.save();
-        //}
-        Log.i("Proximity", "Triggers: " + Trigger.all().size());
-        List<Trigger> triggers = Trigger.all(); 
-        trigger = triggers.get(triggers.size() - 1);
-        Log.i("Proximity", "CurTabs:" + trigger.tabs().size());
+        trigger = null;
+        
+        Intent intent = this.getIntent();
+        
+        if (intent != null) {
+        	long triggerId = intent.getExtras().getLong("trigger-id", -1);
+        	
+        	if (triggerId != -1){
+        		trigger = Trigger.find(triggerId);
+        	}
+        		
+        }
+        
+        if (trigger == null) {
+        	Intent historyActivity = new Intent(this, HistoryActivity.class);
+        	historyActivity.setFlags(historyActivity.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        	this.startActivity(historyActivity);
+        }
         
         setupDrawer();
         
         if (savedInstanceState == null) {
         	setMainContent(0);
         }
-        
-        Intent intent = new Intent(this, BeaconService.class);
-        startService(intent);
         
 	}
 	

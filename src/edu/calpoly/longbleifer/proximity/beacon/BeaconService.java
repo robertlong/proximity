@@ -1,11 +1,7 @@
-package edu.calpoly.longbleifer.proximity;
+package edu.calpoly.longbleifer.proximity.beacon;
 
 import java.util.Collection;
 import java.util.HashMap;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 import com.radiusnetworks.ibeacon.IBeacon;
 import com.radiusnetworks.ibeacon.IBeaconConsumer;
@@ -13,6 +9,10 @@ import com.radiusnetworks.ibeacon.IBeaconManager;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
+import edu.calpoly.longbleifer.proximity.ProximityActivity;
+import edu.calpoly.longbleifer.proximity.R;
+import edu.calpoly.longbleifer.proximity.api.Client;
+import edu.calpoly.longbleifer.proximity.api.TriggerHandler;
 import edu.calpoly.longbleifer.proximity.models.Trigger;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -29,7 +29,6 @@ public class BeaconService extends Service implements IBeaconConsumer {
 	protected static final String TAG = "BeaconService";
     private IBeaconManager iBeaconManager = IBeaconManager.getInstanceForApplication(this);
     private HashMap<String, Trigger> beaconHistory;
-    private Api api;
     private Region region;
     private Context context;
     
@@ -74,7 +73,6 @@ public class BeaconService extends Service implements IBeaconConsumer {
 	@Override
     public void onIBeaconServiceConnect() {
 		beaconHistory = new HashMap<String, Trigger>();
-		api = ApiClient.buildApi();
 		
         iBeaconManager.setRangeNotifier(new RangeNotifier() {
             @Override 
@@ -95,7 +93,7 @@ public class BeaconService extends Service implements IBeaconConsumer {
                         	Log.i(TAG, "Found new beacon ");
                         	Log.i(TAG, "UUID: " + uuid + " Major: " + major + " Minor: " + minor);
                         	
-                        	api.findBeacon(uuid, onFoundBeacon);
+                        	Client.getTrigger(uuid, onFoundBeacon);
                         }
                         
                 	}
@@ -106,19 +104,20 @@ public class BeaconService extends Service implements IBeaconConsumer {
         startBeaconScan();
     }
 	
-	private Callback<Trigger> onFoundBeacon = new Callback<Trigger>() {
+	private TriggerHandler onFoundBeacon = new TriggerHandler() {
 	    @Override
-	    public void success(Trigger trigger, Response response) {
+	    public void afterCreate(Trigger trigger) {
 	    	Log.i(TAG, trigger.toString());
 	    	
 	    	Intent targetIntent = new Intent(context, ProximityActivity.class);
+	    	targetIntent.putExtra("trigger-id", trigger.getId());
 	    	PendingIntent intent = PendingIntent.getActivity(context, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 	    	
 	    	NotificationManager notificationManager =
 	    			(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 	    	Notification  notification = new Notification.Builder(context)
 	    	 .setSmallIcon(R.drawable.ic_launcher)
-	         .setContentTitle("Found beacon!")
+	         .setContentTitle("Found beacon: " + trigger.name)
 	         .setContentText(trigger.toString())
 	         .setContentIntent(intent)
 	         .build();
@@ -126,13 +125,6 @@ public class BeaconService extends Service implements IBeaconConsumer {
 	    	notificationManager.notify(35289, notification);
 	    	
 	    	Log.i("NOTIFICATION", trigger.toString());
-	    	beaconHistory.put(trigger.uuid, trigger);
-	    	startBeaconScan();
-	    }
-
-	    @Override
-	    public void failure(RetrofitError retrofitError) {
-	    	Log.e(TAG, retrofitError.getMessage());
 	    	startBeaconScan();
 	    }
 	};

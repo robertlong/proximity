@@ -1,29 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.calpoly.longbleifer.proximity"
+    android:installLocation="internalOnly"
     android:versionCode="1"
-    android:versionName="1.0"
-    android:installLocation="internalOnly" >
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="18" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
-    <application android:name="edu.calpoly.longbleifer.proximity.Proximity"
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:name="edu.calpoly.longbleifer.proximity.Proximity"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        
-        <meta-data android:name="AA_DB_NAME" android:value="Proximity.db" />
-		<meta-data android:name="AA_DB_VERSION" android:value="1" />
+        <uses-library android:name="android.test.runner" />
+
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="Proximity.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="1" />
         
         <activity
-            android:name="edu.calpoly.longbleifer.proximity.ProximityActivity"
+            android:name="edu.calpoly.longbleifer.proximity.HistoryActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,39 +39,53 @@
             </intent-filter>
         </activity>
         
-        <service android:name="edu.calpoly.longbleifer.proximity.BeaconService">
+
+        <activity
+            android:name="edu.calpoly.longbleifer.proximity.ProximityActivity">
+        </activity>
+
+        <service android:name="edu.calpoly.longbleifer.proximity.beacon.BeaconService" >
             <intent-filter>
-                <action android:name="edu.calpoly.longbleifer.proximity.BeaconService">
+                <action android:name="edu.calpoly.longbleifer.proximity.beacon.BeaconService" >
                 </action>
             </intent-filter>
         </service>
-        
-        <receiver android:name="edu.calpoly.longbleifer.proximity.BeaconServiceReceiver">
+
+        <receiver android:name="edu.calpoly.longbleifer.proximity.beacon.BeaconServiceReceiver" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED">
+                <action android:name="android.intent.action.BOOT_COMPLETED" >
                 </action>
-                <category android:name="android.intent.category.HOME">
+
+                <category android:name="android.intent.category.HOME" >
                 </category>
             </intent-filter>
         </receiver>
-        
-        <service android:enabled="true"
+
+        <service
+            android:name="com.radiusnetworks.ibeacon.service.IBeaconService"
+            android:enabled="true"
             android:exported="true"
             android:isolatedProcess="false"
-            android:label="iBeacon"
-            android:name="com.radiusnetworks.ibeacon.service.IBeaconService">
-        </service>    
-        
-        <service android:enabled="true" 
-            android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor">
-                <meta-data android:name="background" android:value="true" />
-            <intent-filter 
-               android:priority="1" >
+            android:label="iBeacon" >
+        </service>
+        <service
+            android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor"
+            android:enabled="true" >
+            <meta-data
+                android:name="background"
+                android:value="true" />
+
+            <intent-filter android:priority="1" >
                 <action android:name="edu.calpoly.longbleifer.proximity.DID_RANGING" />
                 <action android:name="edu.calpoly.longbleifer.proximity.DID_MONITORING" />
             </intent-filter>
         </service>
-        
-    </application>
+
+	</application>
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:label="Proximity Tests"
+        android:targetPackage="edu.calpoly.longbleifer.proximity" />
 
 </manifest>

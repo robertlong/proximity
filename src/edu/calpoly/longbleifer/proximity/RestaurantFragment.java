@@ -2,7 +2,6 @@ package edu.calpoly.longbleifer.proximity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 import edu.calpoly.longbleifer.proximity.models.RestaurantItem;
 import android.app.ActionBar;

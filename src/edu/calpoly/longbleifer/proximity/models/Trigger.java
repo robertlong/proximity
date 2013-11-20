@@ -1,9 +1,6 @@
 package edu.calpoly.longbleifer.proximity.models;
 
 import java.util.List;
-import java.util.Locale;
-
-import android.annotation.SuppressLint;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.*;
@@ -42,6 +39,10 @@ public class Trigger extends Model {
 	
 	public static List<Trigger> all() {
 		return new Select().from(Trigger.class).execute(); 
+	}
+	
+	public static Trigger find(long id) {
+		return new Select().from(Trigger.class).where("id = ?", id).executeSingle();
 	}
 	
 	public List<Tab> tabs() {

@@ -1,4 +1,4 @@
-package edu.calpoly.longbleifer.proximity;
+package edu.calpoly.longbleifer.proximity.beacon;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
