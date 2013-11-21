@@ -11,19 +11,13 @@ import android.widget.TextView;
 
 public class ItemView extends LinearLayout {
 	
-	private RestaurantItem item;
-	
-	public ItemView(Context context, RestaurantItem item) {
+	public ItemView(Context context) {
 		super(context);
 		LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.item_view, this, true);
-		
-		this.item = item;
-		this.setItem(item);
 	}
 	
 	public void setItem(RestaurantItem item) {
-		this.item = item;
 		
 		TextView itemTitleView = (TextView) findViewById(R.id.itemTitle);
 		itemTitleView.setText(item.name);

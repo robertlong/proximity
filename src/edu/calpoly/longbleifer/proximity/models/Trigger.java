@@ -21,6 +21,9 @@ public class Trigger extends Model {
 	@Column(name = "name")
 	public String name;
 	
+	@Column(name = "message")
+	public String message;
+	
 	public Trigger() {
 		super();
 	}
@@ -30,11 +33,12 @@ public class Trigger extends Model {
 		this.uuid = uuid;
 	}
 	
-	public Trigger (String uuid, double latitude, double longitude, String name) {
+	public Trigger (String uuid, double latitude, double longitude, String name, String message) {
 		this.uuid = uuid;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.name = name;
+		this.message = message;
 	}
 	
 	public static List<Trigger> all() {

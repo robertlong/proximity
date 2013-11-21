@@ -3,7 +3,10 @@ package edu.calpoly.longbleifer.proximity.beacon;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.radiusnetworks.ibeacon.IBeacon;
 import com.radiusnetworks.ibeacon.IBeaconConsumer;
@@ -43,8 +46,7 @@ public class BeaconService extends Service implements IBeaconConsumer {
     public void onCreate() {
     	context = this;
     	Log.i(TAG, "Called onCreate");
-    	region = new Region("main", null, null, null);
-    	
+    	region = new Region("main", null, null, null);	
     }
 
     @Override
@@ -119,12 +121,14 @@ public class BeaconService extends Service implements IBeaconConsumer {
 	    			(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 	    	Notification  notification = new Notification.Builder(context)
 	    	 .setSmallIcon(R.drawable.ic_launcher)
-	         .setContentTitle("Found beacon: " + trigger.name)
-	         .setContentText(trigger.toString())
+	         .setContentTitle(trigger.name)
+	         .setContentText(trigger.message)
 	         .setContentIntent(intent)
 	         .build();
 	    	
 	    	notificationManager.notify(35289, notification);
+	    	
+	    	sendToPebble(trigger.name, trigger.message);
 	    	
 	    	beaconHistory.add(trigger.uuid);
 	    	
@@ -132,5 +136,30 @@ public class BeaconService extends Service implements IBeaconConsumer {
 	    	startBeaconScan();
 	    }
 	};
+	
+	private void sendToPebble(String title, String notificationText) {
+        title = title.trim();
+        notificationText = notificationText.trim();
+        if (title.trim().isEmpty() || notificationText.isEmpty()) {
+            return;
+        }
+
+        // Create json object to be sent to Pebble
+        final Map<String, Object> data = new HashMap<String, Object>();
+
+        data.put("title", title);
+
+        data.put("body", notificationText);
+        final JSONObject jsonData = new JSONObject(data);
+        final String notificationData = new JSONArray().put(jsonData).toString();
+
+        // Create the intent to house the Pebble notification
+        final Intent i = new Intent("com.getpebble.action.SEND_NOTIFICATION");
+        i.putExtra("messageType", "PEBBLE_ALERT");
+        i.putExtra("sender", getString(R.string.app_name));
+        i.putExtra("notificationData", notificationData);
+
+        sendBroadcast(i);
+    }
 
 }

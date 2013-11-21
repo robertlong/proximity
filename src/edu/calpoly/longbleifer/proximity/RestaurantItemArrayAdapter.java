@@ -1,7 +1,6 @@
 package edu.calpoly.longbleifer.proximity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 import android.view.View;
@@ -42,7 +41,7 @@ public class RestaurantItemArrayAdapter extends BaseAdapter {
         RestaurantItem item = this.items.get(position);
 
         if (convertView == null) {
-            itemView = new ItemView(this.context, item);
+            itemView = new ItemView(this.context);
         } else {
             itemView = (ItemView) convertView;
         }

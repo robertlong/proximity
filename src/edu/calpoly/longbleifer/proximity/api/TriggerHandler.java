@@ -18,7 +18,8 @@ public class TriggerHandler extends JsonHttpResponseHandler {
 			double lat = response.getDouble("latitude");
 			double lng = response.getDouble("longitude");
 			String name = response.getString("name");
-			Trigger trigger = new Trigger(uuid, lat, lng, name);
+			String message = response.getString("message");
+			Trigger trigger = new Trigger(uuid, lat, lng, name, message);
 			trigger.save();
 			
 			JSONArray jsonTabs = response.getJSONArray("tabs");

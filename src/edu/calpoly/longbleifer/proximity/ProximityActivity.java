@@ -2,7 +2,6 @@ package edu.calpoly.longbleifer.proximity;
 
 import java.util.List;
 
-import edu.calpoly.longbleifer.proximity.beacon.BeaconService;
 import edu.calpoly.longbleifer.proximity.intents.IntentBuilder;
 import edu.calpoly.longbleifer.proximity.models.Tab;
 import edu.calpoly.longbleifer.proximity.models.Trigger;
