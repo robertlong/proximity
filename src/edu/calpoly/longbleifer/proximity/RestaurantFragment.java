@@ -27,12 +27,11 @@ public class RestaurantFragment extends Fragment {
 	
 	private HashMap<String, ArrayList<RestaurantItem>> itemsByCategory;
 	private edu.calpoly.longbleifer.proximity.models.Tab tab;
+	private ViewPager viewPager;
+	private TabsAdapter tabsAdapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    	int position = this.getArguments().getInt("id");
-		this.tab = ProximityActivity.trigger.tabs().get(position);
-		
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {		
         return inflater.inflate(R.layout.restaurant_fragment, container, false);
     }
 
@@ -40,21 +39,27 @@ public class RestaurantFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        this.itemsByCategory = new HashMap<String, ArrayList<RestaurantItem>>();
-        this.parseItems();
+        if (this.tabsAdapter == null) {
+        	int position = this.getArguments().getInt("id");
+    		this.tab = ProximityActivity.trigger.tabs().get(position);
+            
+            this.itemsByCategory = new HashMap<String, ArrayList<RestaurantItem>>();
+            this.parseItems();
+            
+            final ActionBar bar = this.getActivity().getActionBar();
+            bar.removeAllTabs();
+            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
+            
+            this.viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
+            this.tabsAdapter = new TabsAdapter(this.getActivity(), viewPager, itemsByCategory);
         
-        ViewPager viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
-        TabsAdapter tabsAdapter = new TabsAdapter(this.getActivity(), viewPager, itemsByCategory);
-        viewPager.setAdapter(tabsAdapter);
-
-        final ActionBar bar = this.getActivity().getActionBar();
-        bar.removeAllTabs();
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
-
-        if (savedInstanceState != null) {
-            bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+            if (savedInstanceState != null) {
+                bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+            }
         }
+        
+        this.viewPager.setAdapter(tabsAdapter);
     }
     
     private void parseItems() {
@@ -64,7 +69,7 @@ public class RestaurantFragment extends Fragment {
 
 	        while( categories.hasNext() ){
 	            String category = (String)categories.next();
-	            if( metadata.get(category) instanceof JSONArray ){
+	            if(metadata.get(category) instanceof JSONArray ){
 	            	ArrayList<RestaurantItem> itemArray = new ArrayList<RestaurantItem>();
 	            	JSONArray items = (JSONArray) metadata.get(category);
 	            	for (int i = 0; i < items.length(); i++) {
@@ -107,7 +112,6 @@ public class RestaurantFragment extends Fragment {
                 this.viewPager.setAdapter(this);
                 this.viewPager.setOnPageChangeListener(this);
                 ArrayList<String> categories = new ArrayList<String>(this.itemsByCategory.keySet());
-                
                 for (String category : categories) {
                 	this.addTab(category);
                 }
@@ -131,6 +135,7 @@ public class RestaurantFragment extends Fragment {
             	String category = categories.get(position);
                 ArrayList<RestaurantItem> items = this.itemsByCategory.get(category);
                 ItemsListFragment itemsListFragment = new ItemsListFragment();
+                Log.i("Proximity", "GetItem items: " + items.size());
                 itemsListFragment.setItems(items);
                 return itemsListFragment;
             }

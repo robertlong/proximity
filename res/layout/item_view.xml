@@ -1,37 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    
-    <RelativeLayout
+    android:layout_height="100dp" >
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:maxHeight="100dp" />
+     
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-    	android:orientation="horizontal" 
-    	android:padding="10dp" >
-    
-		<TextView
-	        android:id="@+id/itemTitle"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentLeft="true"
-	        android:text="@string/test_item_title"/>
-		
-		<TextView
-	        android:id="@+id/itemPrice"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentRight="true"
-	        android:text="@string/test_item_price"/>
-	
-	</RelativeLayout>
-	
-    <TextView
-	        android:id="@+id/itemDescription"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:text="@string/test_item_description"
-	        android:paddingLeft="10dp"
-	        android:paddingRight="10dp" />
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp" >
+
+            <TextView
+                android:id="@+id/itemTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/test_item_title" />
+
+            <TextView
+                android:id="@+id/itemPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="@string/test_item_price" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/itemDescription"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="@string/test_item_description" />
+
+    </LinearLayout>
 	
 </LinearLayout>

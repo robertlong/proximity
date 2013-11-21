@@ -57,6 +57,8 @@ public class ProximityActivity extends FragmentActivity {
         	this.startActivity(historyActivity);
         }
         
+        this.title = trigger.name;
+        
         setupDrawer();
         
         if (savedInstanceState == null) {
@@ -75,7 +77,7 @@ public class ProximityActivity extends FragmentActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
+        // Pass any configuration change to the drawer toggles
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
@@ -102,28 +104,11 @@ public class ProximityActivity extends FragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-         // The action bar home/up action should open or close the drawer.
-         // ActionBarDrawerToggle will take care of this.
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         
-        // Handle action buttons
-        switch(item.getItemId()) {
-//        case R.id.action_websearch:
-//            // create intent to perform web search for this planet
-//            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-//            intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
-//            // catch event that there's no activity to handle intent
-//            if (intent.resolveActivity(getPackageManager()) != null) {
-//                startActivity(intent);
-//            } else {
-//                Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
-//            }
-//            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 	
 	private void setupDrawer() {
@@ -169,6 +154,7 @@ public class ProximityActivity extends FragmentActivity {
 		Bundle args = new Bundle();
 		List<Tab> tabs = trigger.tabs();
 		final ActionBar bar = getActionBar();
+		boolean updateSelectedItem = true;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		
         if (position <= tabs.size() - 1) {
@@ -187,10 +173,13 @@ public class ProximityActivity extends FragmentActivity {
     		else if (type.equals("Store")) {
     			fragment = new StoreFragment();
     			fragment.setArguments(args);
-    		}  else if (type.equals("Intent")) {
+    		} 
+    		else if (type.equals("Intent")) {
     			Intent intent = IntentBuilder.build(this, tab);
     			if (intent != null) {
     				this.startActivity(intent);
+    				//When we come we come back to the activity we don't want the intent menu item to be selected.
+    				updateSelectedItem = false; 
     			}
     		}
     		
@@ -199,9 +188,11 @@ public class ProximityActivity extends FragmentActivity {
     			fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
     		}
 
-            // update selected item and title, then close the drawer
-            drawerList.setItemChecked(position, true);
-            setTitle(tabs.get(position).title);
+    		if (updateSelectedItem) {
+    			drawerList.setItemChecked(position, true);
+    			setTitle(tab.title);
+    		}
+            
         }
 		
         drawerLayout.closeDrawer(drawerList);

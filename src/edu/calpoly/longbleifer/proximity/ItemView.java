@@ -1,8 +1,11 @@
 package edu.calpoly.longbleifer.proximity;
 
+import com.squareup.picasso.Picasso;
+
 import edu.calpoly.longbleifer.proximity.models.RestaurantItem;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,11 +29,16 @@ public class ItemView extends LinearLayout {
 		itemTitleView.setText(item.name);
 		
 		TextView itemPriceView = (TextView) findViewById(R.id.itemPrice);
-		itemPriceView.setText(Double.toString(item.price));
+		itemPriceView.setText("$" + Double.toString(item.price));
 		
 		if (item.description != null) {
 			TextView itemDescriptionView = (TextView) findViewById(R.id.itemDescription);
 			itemDescriptionView.setText(item.description);
+		}
+		
+		if (item.image != null) {
+			ImageView imageView = (ImageView) findViewById(R.id.image);
+			Picasso.with(this.getContext()).load(item.image).into(imageView);
 		}
 	}
 }
