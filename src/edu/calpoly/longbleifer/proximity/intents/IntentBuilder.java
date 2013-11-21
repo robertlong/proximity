@@ -15,6 +15,16 @@ public class IntentBuilder {
 			
 			if (type.equals("Facebook")) {
 				return FacebookIntent.build(context, metadata);
+			} else if (type.equals("Twitter")) {
+				return TwitterIntent.build(context, metadata);
+			} else if (type.equals("GooglePlus")) {
+				return GooglePlusIntent.build(context, metadata);
+			} else if (type.equals("Instagram")) {
+				return InstagramIntent.build(context, metadata);
+			} else if (type.equals("Yelp")) {
+				return YelpIntent.build(context, metadata);
+			} else if (type.equals("Foursquare")) {
+				return FoursquareIntent.build(context, metadata);
 			} else if (type.equals("Web")) {
 				return WebIntent.build(context, metadata);
 			} else if (type.equals("Download")) {
