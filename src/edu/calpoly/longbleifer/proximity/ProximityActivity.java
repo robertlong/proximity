@@ -3,6 +3,7 @@ package edu.calpoly.longbleifer.proximity;
 import java.util.List;
 
 import edu.calpoly.longbleifer.proximity.beacon.BeaconService;
+import edu.calpoly.longbleifer.proximity.intents.IntentBuilder;
 import edu.calpoly.longbleifer.proximity.models.Tab;
 import edu.calpoly.longbleifer.proximity.models.Trigger;
 import android.app.ActionBar;
@@ -171,7 +172,8 @@ public class ProximityActivity extends FragmentActivity {
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		
         if (position <= tabs.size() - 1) {
-        	String type = tabs.get(position).type;
+        	Tab tab = tabs.get(position);
+        	String type = tab.type;
         	args.putInt("id", position);
         	
         	if (type.equals("Info")) {
@@ -185,7 +187,12 @@ public class ProximityActivity extends FragmentActivity {
     		else if (type.equals("Store")) {
     			fragment = new StoreFragment();
     			fragment.setArguments(args);
-    		}    		
+    		}  else if (type.equals("Intent")) {
+    			Intent intent = IntentBuilder.build(this, tab);
+    			if (intent != null) {
+    				this.startActivity(intent);
+    			}
+    		}
     		
     		if (fragment != null) {
     			FragmentManager fragmentManager = this.getSupportFragmentManager();
