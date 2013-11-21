@@ -17,6 +17,8 @@ public class IntentBuilder {
 				return FacebookIntent.build(context, metadata);
 			} else if (type.equals("Web")) {
 				return WebIntent.build(context, metadata);
+			} else if (type.equals("Download")) {
+				return DownloadIntent.build(context, metadata);
 			} else {
 				return null;
 			}
