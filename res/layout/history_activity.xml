@@ -15,27 +15,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="100dp"
         android:visibility="invisible" >
 
         <LinearLayout
+            android:id="@+id/card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/map_card_bg" >
+            android:background="@drawable/map_card_bg"
+            android:clickable="true" >
 
             <TextView
                 android:id="@+id/card_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textSize="40sp"
+                android:padding="5dp"
+                android:gravity="center" />
 
             <ImageButton
                 android:id="@+id/card_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:background="@null"
-                android:src="@android:drawable/ic_menu_send" />
+                android:src="@android:drawable/ic_menu_send" 
+                android:layout_gravity="center" />
 
         </LinearLayout>
 

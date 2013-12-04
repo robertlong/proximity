@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -97,7 +98,7 @@ public class HistoryActivity extends FragmentActivity implements LocationListene
             	this.markerTriggers.put(marker, trigger);
             }
             
-            ImageButton cardButton = (ImageButton) this.findViewById(R.id.card_button);
+            LinearLayout cardButton = (LinearLayout) this.findViewById(R.id.card);
             cardButton.setOnClickListener(this);
         }
     }
@@ -158,7 +159,7 @@ public class HistoryActivity extends FragmentActivity implements LocationListene
 	}
 	@Override
 	public void onClick(View v) {
-		if (v.getId() == R.id.card_button && this.selectedTrigger != null) {
+		if (v.getId() == R.id.card && this.selectedTrigger != null) {
 			Intent intent = new Intent(this, ProximityActivity.class);
 			intent.putExtra("trigger-id", this.selectedTrigger.getId());
 			this.startActivity(intent);
