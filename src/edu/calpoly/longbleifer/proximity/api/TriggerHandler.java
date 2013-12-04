@@ -10,6 +10,7 @@ import edu.calpoly.longbleifer.proximity.models.Tab;
 import edu.calpoly.longbleifer.proximity.models.Trigger;
 
 public class TriggerHandler extends JsonHttpResponseHandler {
+
 	@Override
     public void onSuccess(JSONObject response) {
 		
@@ -39,6 +40,11 @@ public class TriggerHandler extends JsonHttpResponseHandler {
 		}
     }
 	
+	@Override
+	public void onFailure(Throwable e, JSONObject errorResponse) {
+		e.printStackTrace();
+	}
+
 	public void afterCreate(Trigger trigger) {
 		
 	}

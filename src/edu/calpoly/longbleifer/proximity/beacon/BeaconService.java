@@ -124,6 +124,7 @@ public class BeaconService extends Service implements IBeaconConsumer {
 	         .setContentTitle(trigger.name)
 	         .setContentText(trigger.message)
 	         .setContentIntent(intent)
+	         .setAutoCancel(true)
 	         .build();
 	    	
 	    	notificationManager.notify(35289, notification);
