@@ -57,6 +57,11 @@
         <activity
             android:name="edu.calpoly.longbleifer.proximity.ProximityActivity"
             android:screenOrientation="portrait">
+            android:label="@string/app_name">
+            <intent-filter>
+            	<category android:name="android.intent.category.DEFAULT" />
+            	<action android:name="edu.calpoly.longbleifer.proximity.ProximityActivity" />
+        	</intent-filter>
         </activity>
 
         <service android:name="edu.calpoly.longbleifer.proximity.beacon.BeaconService" >
