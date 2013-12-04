@@ -23,6 +23,9 @@
 
             <TextView
                 android:id="@+id/itemTitle"
+                android:textSize="20sp"
+                android:typeface="serif"
+                android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -30,6 +33,7 @@
 
             <TextView
                 android:id="@+id/itemPrice"
+                android:textSize="20sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -38,6 +42,8 @@
 
         <TextView
             android:id="@+id/itemDescription"
+            android:textSize="16sp"
+            android:typeface="serif"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="10dp"
