@@ -49,7 +49,6 @@ public class RestaurantFragment extends Fragment {
             final ActionBar bar = this.getActivity().getActionBar();
             bar.removeAllTabs();
             bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
             
             this.viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
             this.tabsAdapter = new TabsAdapter(this.getActivity(), viewPager, itemsByCategory);
