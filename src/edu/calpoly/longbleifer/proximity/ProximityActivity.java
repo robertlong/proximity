@@ -1,5 +1,6 @@
 package edu.calpoly.longbleifer.proximity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.calpoly.longbleifer.proximity.intents.IntentBuilder;
@@ -28,6 +29,7 @@ public class ProximityActivity extends FragmentActivity {
     private ActionBarDrawerToggle drawerToggle;
     private CharSequence title;
     public static Trigger trigger;
+    private ArrayList<NavDrawerItem> navDrawerItems;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +63,7 @@ public class ProximityActivity extends FragmentActivity {
         setupDrawer();
         
         if (savedInstanceState == null) {
-        	setMainContent(0);
+        	setMainContent(1);
         }
         
 	}
@@ -111,8 +113,19 @@ public class ProximityActivity extends FragmentActivity {
     }
 	
 	private void setupDrawer() {
+		List<Tab> tabs = trigger.tabs();
+		this.navDrawerItems = new ArrayList<NavDrawerItem>();
+		this.navDrawerItems.add(new NavMenuSection(0, trigger.name));
+		for (Tab tab : tabs) {
+			this.navDrawerItems.add(new NavMenuItem(tab.position, tab.title, true, this));
+			
+		}
+		
+		this.navDrawerItems.add(new NavMenuSection(tabs.size() + 1, "Proximity"));
+		this.navDrawerItems.add(new NavMenuItem(tabs.size() + 2, "Home", true, this));
+		
         // set up the drawer's list view with items and click listener
-        drawerList.setAdapter(new ArrayAdapter<Tab>(this, R.layout.drawer_list_item, trigger.tabs()));
+        drawerList.setAdapter(new NavDrawerAdapter(this, R.layout.drawer_list_item, this.navDrawerItems));
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
@@ -154,10 +167,10 @@ public class ProximityActivity extends FragmentActivity {
 		boolean updateSelectedItem = true;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		
-        if (position <= tabs.size() - 1) {
-        	Tab tab = tabs.get(position);
+        if (position > 0 && position <= tabs.size()) {
+        	Tab tab = tabs.get(position - 1);
         	String type = tab.type;
-        	args.putInt("id", position);
+        	args.putInt("id", position - 1);
         	
         	if (type.equals("Info")) {
     			fragment = new InfoFragment();
@@ -186,10 +199,13 @@ public class ProximityActivity extends FragmentActivity {
     		}
 
     		if (updateSelectedItem) {
-    			drawerList.setItemChecked(position, true);
+    			drawerList.setItemChecked(position - 1, true);
     			setTitle(tab.title);
-    		}
-            
+    		}   
+        } else if (position == tabs.size() + 2) {
+        	Intent historyIntent = new Intent(this, HistoryActivity.class); 
+        	historyIntent.setFlags(historyIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY); 
+        	this.startActivity(historyIntent);
         }
 		
         drawerLayout.closeDrawer(drawerList);
