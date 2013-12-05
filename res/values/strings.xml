@@ -11,5 +11,6 @@
     <string name="test_item_description">This is a description of a very delicious menu item.</string>
     <string name="title_activity_history">HistoryActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="trigger_loading_message">Downloading app&#x2026;</string>
 
-</resources>
+</resources> 
