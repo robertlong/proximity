@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +31,7 @@ public class ProximityActivity extends FragmentActivity {
     private CharSequence title;
     public static Trigger trigger;
     private ArrayList<NavDrawerItem> navDrawerItems;
+    private int lastTabPosition;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class ProximityActivity extends FragmentActivity {
         setupDrawer();
         
         if (savedInstanceState == null) {
+        	this.lastTabPosition = 1;
         	setMainContent(1);
         }
         
@@ -199,9 +202,13 @@ public class ProximityActivity extends FragmentActivity {
     		}
 
     		if (updateSelectedItem) {
-    			drawerList.setItemChecked(position - 1, true);
+    			this.lastTabPosition = position;
+    			drawerList.setItemChecked(position, true);
     			setTitle(tab.title);
-    		}   
+    		} else {
+    			drawerList.setItemChecked(position, false);
+    			drawerList.setItemChecked(this.lastTabPosition, true);
+    		}
         } else if (position == tabs.size() + 2) {
         	Intent historyIntent = new Intent(this, HistoryActivity.class); 
         	historyIntent.setFlags(historyIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY); 
