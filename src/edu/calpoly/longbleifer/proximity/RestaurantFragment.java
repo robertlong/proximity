@@ -8,6 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+
 import edu.calpoly.longbleifer.proximity.models.RestaurantItem;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -16,6 +18,8 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -39,26 +43,21 @@ public class RestaurantFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        if (this.tabsAdapter == null) {
-        	int position = this.getArguments().getInt("id");
-    		this.tab = ProximityActivity.trigger.tabs().get(position);
-            
-            this.itemsByCategory = new HashMap<String, ArrayList<RestaurantItem>>();
-            this.parseItems();
-            
-            final ActionBar bar = this.getActivity().getActionBar();
-            bar.removeAllTabs();
-            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            
-            this.viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
-            this.tabsAdapter = new TabsAdapter(this.getActivity(), viewPager, itemsByCategory);
+    	int position = this.getArguments().getInt("id");
+		this.tab = ProximityActivity.trigger.tabs().get(position);
         
-            if (savedInstanceState != null) {
-                bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
-            }
-        }
+        this.itemsByCategory = new HashMap<String, ArrayList<RestaurantItem>>();
+        this.parseItems();
         
+        this.viewPager = (ViewPager) this.getActivity().findViewById(R.id.restaurant_pager);
+        this.tabsAdapter = new TabsAdapter(this.getFragmentManager(), itemsByCategory);
         this.viewPager.setAdapter(tabsAdapter);
+        
+        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) this.getActivity().findViewById(R.id.tabs);
+        Log.i("Proximity", this.viewPager.toString());
+        tabs.setViewPager(this.viewPager);
+        
+     
     }
     
     private void parseItems() {
@@ -97,72 +96,36 @@ public class RestaurantFragment extends Fragment {
 			e.printStackTrace();
 		}
     }
+    
+    public class TabsAdapter extends FragmentStatePagerAdapter {
+    	private final HashMap<String, ArrayList<RestaurantItem>> itemsByCategory;
+    	private final ArrayList<String> categories;
 
-    public static class TabsAdapter extends FragmentStatePagerAdapter implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
-            private final ActionBar actionBar;
-            private final ViewPager viewPager;
-            private final HashMap<String, ArrayList<RestaurantItem>> itemsByCategory;
+        public TabsAdapter(FragmentManager fm, HashMap<String, ArrayList<RestaurantItem>> itemsByCategory) {
+        	super(fm);
+        	this.itemsByCategory = itemsByCategory;	
+        	this.categories = new ArrayList<String>(itemsByCategory.keySet());
+        }
 
-            public TabsAdapter(Activity activity, ViewPager pager, HashMap<String, ArrayList<RestaurantItem>> itemsByCategory) {
-                super(((FragmentActivity) activity).getSupportFragmentManager());
-                this.itemsByCategory = itemsByCategory;
-                this.actionBar = activity.getActionBar();
-                this.viewPager = pager;
-                this.viewPager.setAdapter(this);
-                this.viewPager.setOnPageChangeListener(this);
-                ArrayList<String> categories = new ArrayList<String>(this.itemsByCategory.keySet());
-                for (String category : categories) {
-                	this.addTab(category);
-                }
-            }
+        @Override
+        public CharSequence getPageTitle(int position) {
+                return categories.get(position);
+        }
 
-            public void addTab(String category) {
-            	Tab tab = this.actionBar.newTab().setText(category);
-                tab.setTabListener(this);
-                actionBar.addTab(tab);
-                notifyDataSetChanged();
-            }
+        @Override
+        public int getCount() {
+        	return this.itemsByCategory.size();
+        }
 
-            @Override
-            public int getCount() {
-                return this.itemsByCategory.size();
-            }
-
-            @Override
-            public Fragment getItem(int position) {
-            	ArrayList<String> categories = new ArrayList<String>(this.itemsByCategory.keySet());
-            	String category = categories.get(position);
-                ArrayList<RestaurantItem> items = this.itemsByCategory.get(category);
-                ItemsListFragment itemsListFragment = new ItemsListFragment();
-                Log.i("Proximity", "GetItem items: " + items.size());
-                itemsListFragment.setItems(items);
-                return itemsListFragment;
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-
-            @Override
-            public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            	viewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            }
-
-            @Override
-            public void onTabReselected(Tab tab, FragmentTransaction ft) {
-            }
+        @Override
+        public Fragment getItem(int position) {
+        	String category = categories.get(position);
+            ArrayList<RestaurantItem> items = this.itemsByCategory.get(category);
+            ItemsListFragment itemsListFragment = new ItemsListFragment();
+            Log.i("Proximity", "GetItem items: " + items.size());
+            itemsListFragment.setItems(items);
+            return itemsListFragment;
+        }
+        
     }
 }
