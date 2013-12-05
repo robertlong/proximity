@@ -98,7 +98,9 @@ public class HistoryActivity extends FragmentActivity implements LocationListene
             	this.markerTriggers.put(marker, trigger);
             }
             
-            LinearLayout cardButton = (LinearLayout) this.findViewById(R.id.card);
+            TextView cardText = (TextView) this.findViewById(R.id.card_text);
+            cardText.setOnClickListener(this);
+            ImageButton cardButton = (ImageButton) this.findViewById(R.id.card_button);
             cardButton.setOnClickListener(this);
         }
     }
@@ -159,7 +161,7 @@ public class HistoryActivity extends FragmentActivity implements LocationListene
 	}
 	@Override
 	public void onClick(View v) {
-		if (v.getId() == R.id.card && this.selectedTrigger != null) {
+		if (v.getId() == R.id.card_text || v.getId() == R.id.card_button && this.selectedTrigger != null) {
 			Intent intent = new Intent(this, ProximityActivity.class);
 			intent.putExtra("trigger-id", this.selectedTrigger.getId());
 			this.startActivity(intent);

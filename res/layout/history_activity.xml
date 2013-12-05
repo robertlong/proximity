@@ -19,11 +19,9 @@
         android:visibility="invisible" >
 
         <LinearLayout
-            android:id="@+id/card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/map_card_bg"
-            android:clickable="true" >
+            android:background="@drawable/map_card_bg" >
 
             <TextView
                 android:id="@+id/card_text"
@@ -32,7 +30,8 @@
                 android:text="TextView"
                 android:textSize="40sp"
                 android:padding="5dp"
-                android:gravity="center" />
+                android:gravity="center"
+                android:clickable="true" />
 
             <ImageButton
                 android:id="@+id/card_button"
