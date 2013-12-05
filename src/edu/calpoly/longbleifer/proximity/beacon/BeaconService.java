@@ -25,6 +25,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -32,7 +33,7 @@ import android.util.Log;
 public class BeaconService extends Service implements IBeaconConsumer {
 
 	protected static final String TAG = "BeaconService";
-    private IBeaconManager iBeaconManager = IBeaconManager.getInstanceForApplication(this);
+    private IBeaconManager iBeaconManager;
     private ArrayList<String> beaconHistory;
     private Region region;
     private Context context;
@@ -51,7 +52,11 @@ public class BeaconService extends Service implements IBeaconConsumer {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-    	iBeaconManager.bind(this);      
+    	if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+    		iBeaconManager = IBeaconManager.getInstanceForApplication(this);
+    		iBeaconManager.bind(this);
+    	}
+    	    
         return START_STICKY;
     }
 
